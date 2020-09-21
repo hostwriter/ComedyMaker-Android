@@ -21,7 +21,6 @@ class MainActivityTest {
     fun checkList(){
         jokesListIsEmpty()
         jokesListHasNext()
-
     }
 
     private fun jokesListIsEmpty() {
@@ -29,6 +28,20 @@ class MainActivityTest {
     }
 
     private fun jokesListHasNext() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun checkTextView(){
+        emptyJokeText()
+        textIsTooLong()
+    }
+
+    private fun emptyJokeText() {
+        TODO("Not yet implemented")
+    }
+
+    private fun textIsTooLong() {
         TODO("Not yet implemented")
     }
 

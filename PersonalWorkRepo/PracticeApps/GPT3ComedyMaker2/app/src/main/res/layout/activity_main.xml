@@ -8,42 +8,43 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="297dp"
-        android:layout_height="182dp"
-        android:text="Hello World!"
+        android:layout_width="338dp"
+        android:layout_height="333dp"
+        android:autoSizeTextType="uniform"
+        android:text="GPT2 Comedy Writer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.388" />
+        app:layout_constraintVertical_bias="0.256" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/likeFloatingButton"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginEnd="56dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="60dp"
         android:clickable="true"
-        app:fabCustomSize="100dp"
+        app:fabCustomSize="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.913"
+        app:layout_constraintVertical_bias="0.855"
         app:srcCompat="@drawable/ic_baseline_thumb_up_24"
         app:useCompatPadding="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/dislikeFloatingButton"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="56dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="60dp"
         android:clickable="true"
         android:src="@drawable/ic_baseline_thumb_down_24"
-        app:fabCustomSize="100dp"
+        app:fabCustomSize="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.911"
+        app:layout_constraintVertical_bias="0.855"
         app:srcCompat="@drawable/ic_baseline_thumb_down_24"
         app:useCompatPadding="true" />
 
