@@ -1,8 +1,10 @@
 package com.projektekis.gpt3comedymaker
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
@@ -17,10 +19,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         val goodFeedbackList: ArrayList<String> = arrayListOf()
         val downVoteBtn = findViewById<FloatingActionButton>(R.id.dislikeFloatingButton)
         val upVoteBtn = findViewById<FloatingActionButton>(R.id.likeFloatingButton)
         val shownJoke = findViewById<TextView>(R.id.textView)
+
 
         //TODO (This will be replaced by incoming info from api)
         var jokeIterator = setJokeIterator(defaultList)
@@ -44,6 +48,7 @@ class MainActivity : AppCompatActivity() {
                 jokeIterator = setJokeIterator(defaultList)
                 goodFeedbackList.add(shownJoke.text.toString())
                 shownJoke.text = jokeIterator.next()
+
             }
         }
 

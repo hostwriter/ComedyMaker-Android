@@ -1,11 +1,15 @@
 package com.projektekis.gpt3comedymaker
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.isClickable
 import org.junit.Assert
-import org.junit.Test
-
 import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TestRule
+
+
 
 class MainActivityTest {
     var testAct = MainActivity()
@@ -14,6 +18,7 @@ class MainActivityTest {
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
+
 
     @Test
     fun onCreate() {
@@ -28,7 +33,7 @@ class MainActivityTest {
     }
 
     private fun downvoteButtonWorking() {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 
     private fun upvoteButtonWorking() {
