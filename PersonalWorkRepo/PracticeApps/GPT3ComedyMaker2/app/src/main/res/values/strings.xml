@@ -1,8 +1,14 @@
 <resources>
-    <string name="app_name">GPT3 Comedy Maker</string>
+    <string name="app_name">GPT2 Comedy Maker</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="version_number">Version 0.1</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="save">Save</string>
+    <string name="home">Home</string>
+    <string name="favorites">Favorites</string>
+    <string name="about">About</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>
