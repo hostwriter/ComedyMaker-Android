@@ -10,6 +10,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
+import kotlinx.android.synthetic.main.activity_about_page.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_saved_jokes.*
 import okhttp3.*
@@ -83,6 +84,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_favorites -> {
                     val intent = Intent(this, SavedJokes::class.java)
                     intent.putStringArrayListExtra("nav",savedJokesList)
+                    startActivity(intent)
+                }
+                R.id.nav_about -> {
+                    val intent = Intent(this, AboutPage::class.java)
                     startActivity(intent)
                 }
             }
