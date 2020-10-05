@@ -80,7 +80,11 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         nav_view.setNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.nav_favorites -> Toast.makeText(this, "Go to Favorites", Toast.LENGTH_SHORT).show()
+                R.id.nav_favorites -> {
+                    val intent = Intent(this, SavedJokes::class.java)
+                    intent.putStringArrayListExtra("nav",savedJokesList)
+                    startActivity(intent)
+                }
             }
             true
         }

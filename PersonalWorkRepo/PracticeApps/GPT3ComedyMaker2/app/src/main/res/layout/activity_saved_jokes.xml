@@ -9,5 +9,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/saved_jokes_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
