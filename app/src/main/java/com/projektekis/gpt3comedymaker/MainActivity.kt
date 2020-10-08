@@ -5,16 +5,15 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
-import kotlinx.android.synthetic.main.activity_about_page.*
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_saved_jokes.*
 import okhttp3.*
 import java.io.IOException
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         "Wont forget my last job. I can't do this anymore. I've lost my mind.")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val incomingJokes = talkToApi()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -38,17 +39,19 @@ class MainActivity : AppCompatActivity() {
         val upVoteBtn = findViewById<FloatingActionButton>(R.id.likeFloatingButton)
         val shownJoke = findViewById<TextView>(R.id.textView)
         val saveButton = findViewById<Button>(R.id.save_button)
+        val loadBtn = findViewById<Button>(R.id.load_jokes)
 
         saveButton.setOnClickListener{
             if(!savedJokesList.contains(shownJoke.text.toString()))
                 savedJokesList.add(shownJoke.text.toString())
         }
 
-        talkToApi()
-
         //TODO (This will be replaced by incoming info from api)
-        var jokeIterator = setJokeIterator(defaultList)
+        var jokeIterator = setJokeIterator(incomingJokes)
 
+        loadBtn.setOnClickListener{
+            jokeIterator = setJokeIterator(incomingJokes)
+        }
 
         downVoteBtn.setOnClickListener{
             if(jokeIterator.hasNext()) {
@@ -109,8 +112,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun talkToApi(): Boolean {
-        //TODO("Get info from api")
+    fun talkToApi(): ArrayList<String> {
+        val contentList: ArrayList<String> = arrayListOf()
         val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
@@ -124,33 +127,33 @@ class MainActivity : AppCompatActivity() {
                 println(body)
                 val gson = GsonBuilder().create()
 
-//                val jsonJokesList = gson.fromJson(body, JsonJokesList::class.java)
-//
-//                var contentList: ArrayList<String> = arrayListOf()
+                val jsonJokesList: List<JsonJokesList> = gson.fromJson(body, Array<JsonJokesList>::class.java).toList()
 
-
-//                for (content in jsonJokesList.jsonJokes){
-//                    contentList.add(jsonJokesList.)
-//                }
-
+               for (jsonJoke in jsonJokesList){
+                    contentList.add(jsonJoke.content)
+                }
+                println(contentList)
             }
 
         })
 
-        return false
+        return contentList
     }
 
+    class JsonJokesList(val content: String, val comments: List<Comments>, val date: String, val likes: Int, val id: String )
 
-    class JsonJokesList(val jsonJokes: List<jsonJoke>){
-        fun getItemCount(): Int{
-            return jsonJokes.size
-        }
+    class Comments(val content: String, val id: String, val likes: Int)
 
-    }
-
-    class jsonJoke(val id: Int, val content: String, val name: String, val setup: String ){
-
-    }
+//    [
+//    {"content":"I made joke again",
+//    "comments":[{"content":"blah blah blah","id":"1","likes":2},{"content":"lame","id":"2","likes":99}],
+//    "date":"2020-10-06",
+//    "likes":10000,
+//    "id":"1db9c402-0833-11eb-8430-5f572836b1bf"},
+//
+//    {"content":"I made joke","comments":[{"content":"blah blah blah",
+//    "id":"1","likes":2},{"content":"lame","id":"2","likes":99}],"date":"2020-10-06","likes"
+//         :10000,"id":"fb622de2-0830-11eb-b6d2-f327a69147d3"},
 
 
     fun sendFeedback(){
@@ -158,10 +161,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setJokeIterator(jokeList: ArrayList<String>): Iterator<String>{
-        if (jokeList.isEmpty())
-            return defaultList.iterator()
+        return if (jokeList.isEmpty())
+            defaultList.iterator()
         else
-            return jokeList.iterator()
+            jokeList.iterator()
+
     }
 
 }
