@@ -144,17 +144,6 @@ class MainActivity : AppCompatActivity() {
 
     class Comments(val content: String, val id: String, val likes: Int)
 
-//    [
-//    {"content":"I made joke again",
-//    "comments":[{"content":"blah blah blah","id":"1","likes":2},{"content":"lame","id":"2","likes":99}],
-//    "date":"2020-10-06",
-//    "likes":10000,
-//    "id":"1db9c402-0833-11eb-8430-5f572836b1bf"},
-//
-//    {"content":"I made joke","comments":[{"content":"blah blah blah",
-//    "id":"1","likes":2},{"content":"lame","id":"2","likes":99}],"date":"2020-10-06","likes"
-//         :10000,"id":"fb622de2-0830-11eb-b6d2-f327a69147d3"},
-
 
     fun sendFeedback(){
         //TODO("Send list of liked jokes back to the api")
