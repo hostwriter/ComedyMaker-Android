@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
                 savedJokesList.add(shownJoke.text.toString())
         }
 
-        //TODO (This will be replaced by incoming info from api)
         var jokeIterator = setJokeIterator(incomingJokes)
 
         loadBtn.setOnClickListener{
@@ -85,9 +84,7 @@ class MainActivity : AppCompatActivity() {
         nav_view.setNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.nav_favorites -> {
-                    val intent = Intent(this, SavedJokes::class.java)
-                    intent.putStringArrayListExtra("nav",savedJokesList)
-                    startActivity(intent)
+                    goToSavedList(savedJokesList)
                 }
                 R.id.nav_about -> {
                     val intent = Intent(this, AboutPage::class.java)
@@ -107,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
     fun goToSavedList(sendSavedJokes: ArrayList<String>){
         val send = Intent(this, SavedJokes::class.java)
-        send.putStringArrayListExtra("key", savedJokesList)
+        send.putStringArrayListExtra("nav", sendSavedJokes)
         startActivity(send)
     }
 
