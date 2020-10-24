@@ -12,12 +12,18 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import java.io.IOException
+import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var toggle: ActionBarDrawerToggle
+
+    val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
+    var retrievedJsonJokesList: List<JsonJokes> = listOf()
 
     val savedJokesList: ArrayList<String> = arrayListOf()
     val defaultList = arrayListOf("Do I have a right to own a guitar? I don't.",
@@ -53,10 +59,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         downVoteBtn.setOnClickListener{
+            sendFeedback(goodFeedbackList)
             if(jokeIterator.hasNext()) {
                 shownJoke.text = jokeIterator.next()
             }else{
-                jokeIterator = setJokeIterator(defaultList)
+                jokeIterator = setJokeIterator(incomingJokes)
                 shownJoke.text = jokeIterator.next()
             }
         }
@@ -67,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 shownJoke.text = jokeIterator.next()
 
             }else{
-                jokeIterator = setJokeIterator(defaultList)
+                jokeIterator = setJokeIterator(incomingJokes)
                 goodFeedbackList.add(shownJoke.text.toString())
                 shownJoke.text = jokeIterator.next()
 
@@ -75,6 +82,8 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+
 
     private fun setUpNavigationDrawer() {
         toggle = ActionBarDrawerToggle(this, drawer_layout, R.string.open, R.string.close)
@@ -88,6 +97,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_about -> {
                     val intent = Intent(this, AboutPage::class.java)
+                    startActivity(intent)
+                }
+                R.id.nav_home ->{
+                    val intent = Intent(this, HomePage::class.java)
                     startActivity(intent)
                 }
             }
@@ -111,7 +124,6 @@ class MainActivity : AppCompatActivity() {
 
     fun talkToApi(): ArrayList<String> {
         val contentList: ArrayList<String> = arrayListOf()
-        val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object: Callback{
@@ -124,12 +136,13 @@ class MainActivity : AppCompatActivity() {
                 println(body)
                 val gson = GsonBuilder().create()
 
-                val jsonJokesList: List<JsonJokesList> = gson.fromJson(body, Array<JsonJokesList>::class.java).toList()
-
+                val jsonJokesList = gson.fromJson(body, Array<JsonJokes>::class.java).toList()
+                println(jsonJokesList)
                for (jsonJoke in jsonJokesList){
-                    contentList.add(jsonJoke.content)
+                    contentList.add(jsonJoke.title + "\n\n"+ jsonJoke.body)
                 }
-                println(contentList)
+                //println(contentList)
+                retrievedJsonJokesList = collectIncomingJson(jsonJokesList)
             }
 
         })
@@ -137,13 +150,53 @@ class MainActivity : AppCompatActivity() {
         return contentList
     }
 
-    class JsonJokesList(val content: String, val comments: List<Comments>, val date: String, val likes: Int, val id: String )
+    class JsonJokes(val theme: String, val comments: List<Comments>, val id: String, val title: String, val body: String, val author: String )
 
-    class Comments(val content: String, val id: String, val likes: Int)
+    class Comments(val content: String, val author: String)
 
 
-    fun sendFeedback(){
+    fun sendFeedback(likedJokes: ArrayList<String>){
         //TODO("Send list of liked jokes back to the api")
+        val toSend = arrayListOf<String>()
+        for(items in likedJokes){
+            for(jsonJoke in retrievedJsonJokesList){
+                if(jsonJoke.title+ "\n\n" + jsonJoke.body == items){
+                    toSend.add(jsonJoke.id)
+                }
+            }
+        }
+
+        val client = OkHttpClient()
+        val payload = "test payload"
+        val requestbody = payload.toRequestBody()
+        val body = RequestBody.create(null, "")
+        println("TO SEND FEEDBACK SIZE: " + toSend.size)
+        for (id in toSend) {
+            println("ID sent: " + id+"\nFull URL: " + "$url/$id/like")
+            val request = Request.Builder()
+                .put(requestbody)
+                .url("$url/$id/like")
+                .build()
+            client.newCall(request).enqueue(object : Callback{
+                override fun onFailure(call: Call, e: IOException){
+                    println("callback failed")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    println(response)
+                }
+            })
+//                .url("$url/$id/like")
+//                .put(body)
+//                .build()
+
+        }
+
+    }
+
+    fun collectIncomingJson(jsonJokesList: List<JsonJokes>): List<JsonJokes>{
+        println("COLLECT JSON METHOD SIZE: " + jsonJokesList.size)
+        return jsonJokesList
     }
 
     fun setJokeIterator(jokeList: ArrayList<String>): Iterator<String>{
@@ -152,6 +205,29 @@ class MainActivity : AppCompatActivity() {
         else
             jokeList.iterator()
 
+    }
+
+    fun getSingleJokeFromApi(){
+        val request = Request.Builder().url(url).build()
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object: Callback{
+            override fun onFailure(call: Call, e: IOException) {
+                println("Failed to execute request.")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response?.body?.string()
+                //println(body)
+                val gson = GsonBuilder().create()
+
+                val jsonJokesList = gson.fromJson(body, Array<JsonJokes>::class.java).toList()
+                println(jsonJokesList)
+
+                //println(contentList)
+                retrievedJsonJokesList = collectIncomingJson(jsonJokesList)
+            }
+
+        })
     }
 
 }

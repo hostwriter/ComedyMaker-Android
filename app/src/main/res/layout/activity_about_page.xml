@@ -30,14 +30,13 @@
         android:paddingEnd="20dp"
         android:autoSizeTextType="uniform"/>
 
-    <EditText
+    <TextView
         android:id="@+id/dev_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
         android:ems="10"
         android:gravity="start|top"
-        android:inputType="textMultiLine"
         android:text="@string/dev_team"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

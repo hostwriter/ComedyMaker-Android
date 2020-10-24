@@ -12,9 +12,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.row_layout.view.*
 
 class HomePage : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
+
+
 
         val defaultList = arrayListOf("Do I have a right to own a guitar? I don't.",
             "I like to joke. I do iced iced iced ices.",
