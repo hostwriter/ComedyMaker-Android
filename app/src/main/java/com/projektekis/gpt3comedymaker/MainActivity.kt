@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
 
     val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
     var retrievedJsonJokesList: List<JsonJokes> = listOf()
+    val goodFeedbackList: ArrayList<String> = arrayListOf()
+    val badFeedbackList: ArrayList<String> = arrayListOf()
 
     val savedJokesList: ArrayList<String> = arrayListOf()
     val defaultList = arrayListOf("Do I have a right to own a guitar? I don't.",
@@ -40,7 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         setUpNavigationDrawer()
 
-        val goodFeedbackList: ArrayList<String> = arrayListOf()
         val downVoteBtn = findViewById<FloatingActionButton>(R.id.dislikeFloatingButton)
         val upVoteBtn = findViewById<FloatingActionButton>(R.id.likeFloatingButton)
         val shownJoke = findViewById<TextView>(R.id.textView)
@@ -56,13 +57,15 @@ class MainActivity : AppCompatActivity() {
 
         loadBtn.setOnClickListener{
             jokeIterator = setJokeIterator(incomingJokes)
+            shownJoke.text = jokeIterator.next()
         }
 
         downVoteBtn.setOnClickListener{
-            sendFeedback(goodFeedbackList)
             if(jokeIterator.hasNext()) {
+                badFeedbackList.add(shownJoke.text.toString())
                 shownJoke.text = jokeIterator.next()
             }else{
+                badFeedbackList.add(shownJoke.text.toString())
                 jokeIterator = setJokeIterator(incomingJokes)
                 shownJoke.text = jokeIterator.next()
             }
@@ -155,8 +158,7 @@ class MainActivity : AppCompatActivity() {
     class Comments(val content: String, val author: String)
 
 
-    fun sendFeedback(likedJokes: ArrayList<String>){
-        //TODO("Send list of liked jokes back to the api")
+    fun sendLikeFeedback(likedJokes: ArrayList<String>){
         val toSend = arrayListOf<String>()
         for(items in likedJokes){
             for(jsonJoke in retrievedJsonJokesList){
@@ -167,14 +169,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         val client = OkHttpClient()
-        val payload = "test payload"
-        val requestbody = payload.toRequestBody()
-        val body = RequestBody.create(null, "")
+        //val payload = ""
+        val requestBody = "".toRequestBody()
         println("TO SEND FEEDBACK SIZE: " + toSend.size)
         for (id in toSend) {
             println("ID sent: " + id+"\nFull URL: " + "$url/$id/like")
             val request = Request.Builder()
-                .put(requestbody)
+                .put(requestBody)
                 .url("$url/$id/like")
                 .build()
             client.newCall(request).enqueue(object : Callback{
@@ -186,10 +187,6 @@ class MainActivity : AppCompatActivity() {
                     println(response)
                 }
             })
-//                .url("$url/$id/like")
-//                .put(body)
-//                .build()
-
         }
 
     }
@@ -204,6 +201,38 @@ class MainActivity : AppCompatActivity() {
             defaultList.iterator()
         else
             jokeList.iterator()
+
+    }
+
+    fun sendDislikeFeedback(likedJokes: ArrayList<String>){
+        val toSend = arrayListOf<String>()
+        for(items in likedJokes){
+            for(jsonJoke in retrievedJsonJokesList){
+                if(jsonJoke.title+ "\n\n" + jsonJoke.body == items){
+                    toSend.add(jsonJoke.id)
+                }
+            }
+        }
+
+        val client = OkHttpClient()
+        val requestBody = "".toRequestBody()
+        println("TO SEND FEEDBACK SIZE: " + toSend.size)
+        for (id in toSend) {
+            println("ID sent: $id\nFull URL: $url/$id/dislike")
+            val request = Request.Builder()
+                .put(requestBody)
+                .url("$url/$id/like")
+                .build()
+            client.newCall(request).enqueue(object : Callback{
+                override fun onFailure(call: Call, e: IOException){
+                    println("callback failed")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    println(response)
+                }
+            })
+        }
 
     }
 
@@ -229,5 +258,6 @@ class MainActivity : AppCompatActivity() {
 
         })
     }
+
 
 }

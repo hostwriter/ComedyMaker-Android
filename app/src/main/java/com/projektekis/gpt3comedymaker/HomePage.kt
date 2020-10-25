@@ -33,7 +33,7 @@ class HomePage : AppCompatActivity() {
         }
         val homeList: RecyclerView = findViewById(R.id.home_list)
         homeList.layoutManager = LinearLayoutManager(this)
-        homeList.adapter = SavedJokes.Adapter(jokeArrayList = defaultList)
+        homeList.adapter = HomePage.Adapter(jokeArrayList = defaultList)
     }
 
     class Adapter(val jokeArrayList: ArrayList<String>): RecyclerView.Adapter<MyViewHolder>(){
