@@ -9,13 +9,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
 import java.io.IOException
-import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
@@ -62,10 +59,14 @@ class MainActivity : AppCompatActivity() {
 
         downVoteBtn.setOnClickListener{
             if(jokeIterator.hasNext()) {
-                badFeedbackList.add(shownJoke.text.toString())
+                if(!badFeedbackList.contains(shownJoke.text.toString())) {
+                    badFeedbackList.add(shownJoke.text.toString())
+                }
                 shownJoke.text = jokeIterator.next()
             }else{
-                badFeedbackList.add(shownJoke.text.toString())
+                if(!badFeedbackList.contains(shownJoke.text.toString())) {
+                    badFeedbackList.add(shownJoke.text.toString())
+                }
                 jokeIterator = setJokeIterator(incomingJokes)
                 shownJoke.text = jokeIterator.next()
             }
@@ -73,20 +74,22 @@ class MainActivity : AppCompatActivity() {
 
         upVoteBtn.setOnClickListener{
             if(jokeIterator.hasNext()) {
-                goodFeedbackList.add(shownJoke.text.toString())
+                if(!goodFeedbackList.contains(shownJoke.text.toString())) {
+                    goodFeedbackList.add(shownJoke.text.toString())
+                }
                 shownJoke.text = jokeIterator.next()
 
             }else{
                 jokeIterator = setJokeIterator(incomingJokes)
-                goodFeedbackList.add(shownJoke.text.toString())
+                if(!goodFeedbackList.contains(shownJoke.text.toString())) {
+                    goodFeedbackList.add(shownJoke.text.toString())
+                }
                 shownJoke.text = jokeIterator.next()
 
             }
         }
 
     }
-
-
 
     private fun setUpNavigationDrawer() {
         toggle = ActionBarDrawerToggle(this, drawer_layout, R.string.open, R.string.close)
@@ -105,6 +108,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home ->{
                     val intent = Intent(this, HomePage::class.java)
                     startActivity(intent)
+                }
+                R.id.send_feedback->{
+                    sendLikeFeedback(goodFeedbackList)
+                    sendDislikeFeedback(badFeedbackList)
                 }
             }
             true
@@ -135,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val body = response?.body?.string()
+                val body = response.body?.string()
                 println(body)
                 val gson = GsonBuilder().create()
 
@@ -169,11 +176,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         val client = OkHttpClient()
-        //val payload = ""
         val requestBody = "".toRequestBody()
         println("TO SEND FEEDBACK SIZE: " + toSend.size)
         for (id in toSend) {
-            println("ID sent: " + id+"\nFull URL: " + "$url/$id/like")
             val request = Request.Builder()
                 .put(requestBody)
                 .url("$url/$id/like")
@@ -218,10 +223,9 @@ class MainActivity : AppCompatActivity() {
         val requestBody = "".toRequestBody()
         println("TO SEND FEEDBACK SIZE: " + toSend.size)
         for (id in toSend) {
-            println("ID sent: $id\nFull URL: $url/$id/dislike")
             val request = Request.Builder()
                 .put(requestBody)
-                .url("$url/$id/like")
+                .url("$url/$id/dislike")
                 .build()
             client.newCall(request).enqueue(object : Callback{
                 override fun onFailure(call: Call, e: IOException){
@@ -245,7 +249,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val body = response?.body?.string()
+                val body = response.body?.string()
                 //println(body)
                 val gson = GsonBuilder().create()
 
