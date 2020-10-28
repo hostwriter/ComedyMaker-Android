@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 R.id.nav_home ->{
-                    val intent = Intent(this, HomePage::class.java)
+                    val intent = Intent(this, TopJokesPage::class.java)
                     startActivity(intent)
                 }
                 R.id.send_feedback->{

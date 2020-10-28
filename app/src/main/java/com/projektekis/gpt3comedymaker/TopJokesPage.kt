@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.row_layout.view.*
 
-class HomePage : AppCompatActivity() {
+class TopJokesPage : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_page)
+        setContentView(R.layout.activity_top_jokes_page)
 
 
 
@@ -33,7 +33,7 @@ class HomePage : AppCompatActivity() {
         }
         val homeList: RecyclerView = findViewById(R.id.home_list)
         homeList.layoutManager = LinearLayoutManager(this)
-        homeList.adapter = HomePage.Adapter(jokeArrayList = defaultList)
+        homeList.adapter = TopJokesPage.Adapter(jokeArrayList = defaultList)
     }
 
     class Adapter(val jokeArrayList: ArrayList<String>): RecyclerView.Adapter<MyViewHolder>(){
