@@ -14,18 +14,17 @@ import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
-
 class MainActivity : AppCompatActivity() {
 
     lateinit var toggle: ActionBarDrawerToggle
 
     val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
-    var retrievedJsonJokesList: List<JsonJokes> = listOf()
-    val goodFeedbackList: ArrayList<String> = arrayListOf()
-    val badFeedbackList: ArrayList<String> = arrayListOf()
+    var retrievedJsonJokesList: List<JsonJokes> = arrayListOf()
+    private val goodFeedbackList: ArrayList<String> = arrayListOf()
+    private val badFeedbackList: ArrayList<String> = arrayListOf()
 
-    val savedJokesList: ArrayList<String> = arrayListOf()
-    val defaultList = arrayListOf("Do I have a right to own a guitar? I don't.",
+    private val savedJokesList: ArrayList<String> = arrayListOf()
+    private val defaultList = arrayListOf("Do I have a right to own a guitar? I don't.",
         "I like to joke. I do iced iced iced ices.",
         "I'll give you a list of the top 1% of the population who doesn't work two days a week, and " +
                 "a list of the worst 6% that doesn't work any more... and a great name.",
@@ -110,8 +109,8 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 R.id.send_feedback->{
-                    sendLikeFeedback(goodFeedbackList)
-                    sendDislikeFeedback(badFeedbackList)
+                    TalkToAPI("like").sendFeedback(goodFeedbackList, retrievedJsonJokesList)
+                    TalkToAPI("dislike").sendFeedback(badFeedbackList, retrievedJsonJokesList)
                 }
             }
             true
@@ -130,7 +129,6 @@ class MainActivity : AppCompatActivity() {
         send.putStringArrayListExtra("nav", sendSavedJokes)
         startActivity(send)
     }
-
 
     fun talkToApi(): ArrayList<String> {
         val contentList: ArrayList<String> = arrayListOf()
@@ -151,53 +149,13 @@ class MainActivity : AppCompatActivity() {
                for (jsonJoke in jsonJokesList){
                     contentList.add(jsonJoke.title + "\n\n"+ jsonJoke.body)
                 }
-                //println(contentList)
                 retrievedJsonJokesList = collectIncomingJson(jsonJokesList)
             }
-
         })
-
         return contentList
     }
 
-    class JsonJokes(val theme: String, val comments: List<Comments>, val id: String, val title: String, val body: String, val author: String )
-
-    class Comments(val content: String, val author: String)
-
-
-    fun sendLikeFeedback(likedJokes: ArrayList<String>){
-        val toSend = arrayListOf<String>()
-        for(items in likedJokes){
-            for(jsonJoke in retrievedJsonJokesList){
-                if(jsonJoke.title+ "\n\n" + jsonJoke.body == items){
-                    toSend.add(jsonJoke.id)
-                }
-            }
-        }
-
-        val client = OkHttpClient()
-        val requestBody = "".toRequestBody()
-        println("TO SEND FEEDBACK SIZE: " + toSend.size)
-        for (id in toSend) {
-            val request = Request.Builder()
-                .put(requestBody)
-                .url("$url/$id/like")
-                .build()
-            client.newCall(request).enqueue(object : Callback{
-                override fun onFailure(call: Call, e: IOException){
-                    println("callback failed")
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    println(response)
-                }
-            })
-        }
-
-    }
-
     fun collectIncomingJson(jsonJokesList: List<JsonJokes>): List<JsonJokes>{
-        println("COLLECT JSON METHOD SIZE: " + jsonJokesList.size)
         return jsonJokesList
     }
 
@@ -206,62 +164,5 @@ class MainActivity : AppCompatActivity() {
             defaultList.iterator()
         else
             jokeList.iterator()
-
     }
-
-    fun sendDislikeFeedback(likedJokes: ArrayList<String>){
-        val toSend = arrayListOf<String>()
-        for(items in likedJokes){
-            for(jsonJoke in retrievedJsonJokesList){
-                if(jsonJoke.title+ "\n\n" + jsonJoke.body == items){
-                    toSend.add(jsonJoke.id)
-                }
-            }
-        }
-
-        val client = OkHttpClient()
-        val requestBody = "".toRequestBody()
-        println("TO SEND FEEDBACK SIZE: " + toSend.size)
-        for (id in toSend) {
-            val request = Request.Builder()
-                .put(requestBody)
-                .url("$url/$id/dislike")
-                .build()
-            client.newCall(request).enqueue(object : Callback{
-                override fun onFailure(call: Call, e: IOException){
-                    println("callback failed")
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    println(response)
-                }
-            })
-        }
-
-    }
-
-    fun getSingleJokeFromApi(){
-        val request = Request.Builder().url(url).build()
-        val client = OkHttpClient()
-        client.newCall(request).enqueue(object: Callback{
-            override fun onFailure(call: Call, e: IOException) {
-                println("Failed to execute request.")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string()
-                //println(body)
-                val gson = GsonBuilder().create()
-
-                val jsonJokesList = gson.fromJson(body, Array<JsonJokes>::class.java).toList()
-                println(jsonJokesList)
-
-                //println(contentList)
-                retrievedJsonJokesList = collectIncomingJson(jsonJokesList)
-            }
-
-        })
-    }
-
-
 }
