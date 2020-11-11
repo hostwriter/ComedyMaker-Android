@@ -39,8 +39,8 @@ class TopJokesPage : AppCompatActivity() {
     class Adapter(val jokeArrayList: ArrayList<String>): RecyclerView.Adapter<MyViewHolder>(){
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-            val layoutInflater = LayoutInflater.from(parent?.context)
-            val cellForRow = layoutInflater.inflate(R.layout.home_row_layout, parent, false)
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val cellForRow = layoutInflater.inflate(R.layout.row_layout, parent, false)
             return MyViewHolder(cellForRow)
         }
 

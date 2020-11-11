@@ -7,11 +7,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         "Wont forget my last job. I can't do this anymore. I've lost my mind.")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val incomingJokes = talkToApi()
+        talkToApi()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,53 +41,60 @@ class MainActivity : AppCompatActivity() {
 
         val downVoteBtn = findViewById<FloatingActionButton>(R.id.dislikeFloatingButton)
         val upVoteBtn = findViewById<FloatingActionButton>(R.id.likeFloatingButton)
-        val shownJoke = findViewById<TextView>(R.id.textView)
-        val saveButton = findViewById<Button>(R.id.save_button)
+        val jokeHeader = findViewById<TextView>(R.id.titleTextView)
+        val jokePunchline = findViewById<TextView>(R.id.textViewPunchline)
+        val jokeAuthor = findViewById<TextView>(R.id.authorName)
+        val saveButton = findViewById<FloatingActionButton>(R.id.save_button)
         val loadBtn = findViewById<Button>(R.id.load_jokes)
+        var jokeIndex = 0
 
         saveButton.setOnClickListener{
-            if(!savedJokesList.contains(shownJoke.text.toString()))
-                savedJokesList.add(shownJoke.text.toString())
+            if(!savedJokesList.contains(jokeHeader.text.toString()))
+                savedJokesList.add(jokeHeader.text.toString())
         }
 
-        var jokeIterator = setJokeIterator(incomingJokes)
+        //var jokeIterator = setJokeIterator(incomingJokes)
+        jokeHeader.setOnClickListener{
+            jokePunchline.isVisible = true
+        }
 
         loadBtn.setOnClickListener{
-            jokeIterator = setJokeIterator(incomingJokes)
-            shownJoke.text = jokeIterator.next()
+            jokeHeader.text = retrievedJsonJokesList[jokeIndex].title
+            jokeAuthor.text = retrievedJsonJokesList[jokeIndex].author
+            jokePunchline.text = retrievedJsonJokesList[jokeIndex].body
+            jokeIndex++
+            //jokeIterator = setJokeIterator(incomingJokes)
+            //jokeHeader.text = jokeIterator.next()
         }
 
         downVoteBtn.setOnClickListener{
-            if(jokeIterator.hasNext()) {
-                if(!badFeedbackList.contains(shownJoke.text.toString())) {
-                    badFeedbackList.add(shownJoke.text.toString())
-                }
-                shownJoke.text = jokeIterator.next()
-            }else{
-                if(!badFeedbackList.contains(shownJoke.text.toString())) {
-                    badFeedbackList.add(shownJoke.text.toString())
-                }
-                jokeIterator = setJokeIterator(incomingJokes)
-                shownJoke.text = jokeIterator.next()
+            jokePunchline.isGone = true
+            jokeIndex++
+            if(jokeIndex >= retrievedJsonJokesList.size) jokeIndex = 0
+            if(!badFeedbackList.contains(retrievedJsonJokesList[jokeIndex].id)) {
+                badFeedbackList.add(retrievedJsonJokesList[jokeIndex].id)
             }
+            jokeHeader.text = retrievedJsonJokesList[jokeIndex].title
+            jokeAuthor.text = retrievedJsonJokesList[jokeIndex].author
+            jokePunchline.text = retrievedJsonJokesList[jokeIndex].body
+
         }
 
         upVoteBtn.setOnClickListener{
-            if(jokeIterator.hasNext()) {
-                if(!goodFeedbackList.contains(shownJoke.text.toString())) {
-                    goodFeedbackList.add(shownJoke.text.toString())
-                }
-                shownJoke.text = jokeIterator.next()
-
-            }else{
-                jokeIterator = setJokeIterator(incomingJokes)
-                if(!goodFeedbackList.contains(shownJoke.text.toString())) {
-                    goodFeedbackList.add(shownJoke.text.toString())
-                }
-                shownJoke.text = jokeIterator.next()
-
+            jokePunchline.isGone = true
+            jokeIndex++
+            if(jokeIndex >= retrievedJsonJokesList.size) jokeIndex = 0
+            if(!goodFeedbackList.contains(retrievedJsonJokesList[jokeIndex].id)) {
+                goodFeedbackList.add(retrievedJsonJokesList[jokeIndex].id)
             }
+            jokeHeader.text = retrievedJsonJokesList[jokeIndex].title
+            jokeAuthor.text = retrievedJsonJokesList[jokeIndex].author
+            jokePunchline.text = retrievedJsonJokesList[jokeIndex].body
         }
+         //TODO: Grab comments from each joke and add them to a list to send
+//        val commentList: RecyclerView = findViewById(R.id.main_comment_list)
+//        commentList.layoutManager = LinearLayoutManager(this)
+//        commentList.adapter = CommentAdapter(arraylistOf(""))
 
     }
 
@@ -130,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(send)
     }
 
-    fun talkToApi(): ArrayList<String> {
+    fun talkToApi(){
         val contentList: ArrayList<String> = arrayListOf()
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
@@ -152,17 +160,17 @@ class MainActivity : AppCompatActivity() {
                 retrievedJsonJokesList = collectIncomingJson(jsonJokesList)
             }
         })
-        return contentList
     }
 
     fun collectIncomingJson(jsonJokesList: List<JsonJokes>): List<JsonJokes>{
+        println("collectIncomingJson size: " + jsonJokesList.size)
         return jsonJokesList
     }
 
-    fun setJokeIterator(jokeList: ArrayList<String>): Iterator<String>{
-        return if (jokeList.isEmpty())
-            defaultList.iterator()
-        else
-            jokeList.iterator()
-    }
+//    fun setJokeIterator(jokeList: ArrayList<String>): Iterator<String>{
+//        return if (jokeList.isEmpty())
+//            defaultList.iterator()
+//        else
+//            jokeList.iterator()
+//    }
 }
