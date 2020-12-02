@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -24,7 +27,8 @@ class MainActivity : AppCompatActivity() {
     private val goodFeedbackList: ArrayList<String> = arrayListOf()
     private val badFeedbackList: ArrayList<String> = arrayListOf()
 
-    private val savedJokesList: ArrayList<String> = arrayListOf()
+    private val savedJokesList: ArrayList<JsonJokes> = arrayListOf()
+
     private val defaultList = arrayListOf("Do I have a right to own a guitar? I don't.",
         "I like to joke. I do iced iced iced ices.",
         "I'll give you a list of the top 1% of the population who doesn't work two days a week, and " +
@@ -45,31 +49,53 @@ class MainActivity : AppCompatActivity() {
         val jokePunchline = findViewById<TextView>(R.id.textViewPunchline)
         val jokeAuthor = findViewById<TextView>(R.id.authorName)
         val saveButton = findViewById<FloatingActionButton>(R.id.save_button)
-        val loadBtn = findViewById<Button>(R.id.load_jokes)
+        val showComments = findViewById<TextView>(R.id.main_show_comments)
+        val commentList: RecyclerView = findViewById(R.id.main_comment_list)
+
         var jokeIndex = 0
 
+        commentList.layoutManager = LinearLayoutManager(this)
+
+
+
         saveButton.setOnClickListener{
-            if(!savedJokesList.contains(jokeHeader.text.toString()))
-                savedJokesList.add(jokeHeader.text.toString())
+            if(!savedJokesList.contains(retrievedJsonJokesList[jokeIndex])) {
+                savedJokesList.add(retrievedJsonJokesList[jokeIndex])
+            }
         }
 
-        //var jokeIterator = setJokeIterator(incomingJokes)
         jokeHeader.setOnClickListener{
             jokePunchline.isVisible = true
+            showComments.isVisible = true
         }
 
-        loadBtn.setOnClickListener{
+
+        intro_layout.setOnClickListener{
             jokeHeader.text = retrievedJsonJokesList[jokeIndex].title
             jokeAuthor.text = retrievedJsonJokesList[jokeIndex].author
             jokePunchline.text = retrievedJsonJokesList[jokeIndex].body
+            intro_layout.isGone = true
+            println("current comments: " + retrievedJsonJokesList[jokeIndex].comments)
+            commentList.adapter = CommentAdapter(retrievedJsonJokesList[jokeIndex].comments)
+
             jokeIndex++
-            //jokeIterator = setJokeIterator(incomingJokes)
-            //jokeHeader.text = jokeIterator.next()
+
+
+        }
+
+        showComments.setOnClickListener{
+            commentList.isVisible = true
+
+            Toast.makeText(this, "show comments pressed", Toast.LENGTH_SHORT).show()
         }
 
         downVoteBtn.setOnClickListener{
+            showComments.isGone = true
+            commentList.isGone = true
             jokePunchline.isGone = true
             jokeIndex++
+            commentList.adapter = CommentAdapter(retrievedJsonJokesList[jokeIndex].comments)
+
             if(jokeIndex >= retrievedJsonJokesList.size) jokeIndex = 0
             if(!badFeedbackList.contains(retrievedJsonJokesList[jokeIndex].id)) {
                 badFeedbackList.add(retrievedJsonJokesList[jokeIndex].id)
@@ -81,8 +107,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         upVoteBtn.setOnClickListener{
+            showComments.isGone = true
+            commentList.isGone = true
             jokePunchline.isGone = true
             jokeIndex++
+            commentList.adapter = CommentAdapter(retrievedJsonJokesList[jokeIndex].comments)
+
             if(jokeIndex >= retrievedJsonJokesList.size) jokeIndex = 0
             if(!goodFeedbackList.contains(retrievedJsonJokesList[jokeIndex].id)) {
                 goodFeedbackList.add(retrievedJsonJokesList[jokeIndex].id)
@@ -91,10 +121,7 @@ class MainActivity : AppCompatActivity() {
             jokeAuthor.text = retrievedJsonJokesList[jokeIndex].author
             jokePunchline.text = retrievedJsonJokesList[jokeIndex].body
         }
-         //TODO: Grab comments from each joke and add them to a list to send
-//        val commentList: RecyclerView = findViewById(R.id.main_comment_list)
-//        commentList.layoutManager = LinearLayoutManager(this)
-//        commentList.adapter = CommentAdapter(arraylistOf(""))
+
 
     }
 
@@ -132,9 +159,9 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun goToSavedList(sendSavedJokes: ArrayList<String>){
+    fun goToSavedList(sendSavedJokes: ArrayList<JsonJokes>){
         val send = Intent(this, SavedJokes::class.java)
-        send.putStringArrayListExtra("nav", sendSavedJokes)
+        send.putParcelableArrayListExtra("nav", sendSavedJokes)
         startActivity(send)
     }
 

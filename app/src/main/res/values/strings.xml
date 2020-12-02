@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GPT2 Comedy Maker</string>
+    <string name="app_name">GPT Comedy Maker</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="version_number">Version 0.1</string>
@@ -11,10 +11,11 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
 
-    <string name="about_info">GPT2 Comedy Maker is an application which attempts to create jokes
+    <string name="about_info">GPT2 Comedy Maker is an application which attempts to create jokes using
         machine learning that implements OpenAIs "General Pretrained Transformer" model. It takes
         in information from the internet and feedback from the users to improve it\'s comedic
         ability. </string>
+    <string name="intro_description">Jokes Written by a Machine Learning Algorithm</string>
 
     <string name="dev_team">
         <u><b>Dev Team</b></u>\n
@@ -36,4 +37,8 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="jokes_of_the_day">Jokes of the Day</string>
+    <string name="author_name">Author Name:</string>
+    <string name="show_comments">Show Comments</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

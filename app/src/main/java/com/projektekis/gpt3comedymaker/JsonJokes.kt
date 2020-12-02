@@ -1,4 +1,11 @@
 package com.projektekis.gpt3comedymaker
 
-class JsonJokes(val theme: String, val likes: Int, val dislikes: Int, val comments: List<Comments>, val id: String, val title: String, val body: String, val author: String )
-class Comments(val content: String, val author: String)
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+class JsonJokes(val theme: String, val likes: Int, val comments: ArrayList<Comments>, val dislikes: Int, val id: String,
+                val title: String, val body: String, val author: String ) : Parcelable
+
+@Parcelize
+class Comments(val body: String?, val author: String?) : Parcelable

@@ -4,10 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.comment_row_layout.view.*
 import kotlinx.android.synthetic.main.row_layout.view.*
 
-class CommentAdapter(val commentArrayList: ArrayList<String>): RecyclerView.Adapter<MyViewHolder>(){
+class CommentAdapter(val commentArrayList: ArrayList<Comments>): RecyclerView.Adapter<MyViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -16,8 +18,8 @@ class CommentAdapter(val commentArrayList: ArrayList<String>): RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val comment = commentArrayList[position]
-        holder.itemView.joke_list_item?.text = comment
+        holder.commentAuthor?.text = commentArrayList[position].author
+        holder.commentContent?.text = commentArrayList[position].body
     }
 
     override fun getItemCount(): Int{
@@ -25,4 +27,7 @@ class CommentAdapter(val commentArrayList: ArrayList<String>): RecyclerView.Adap
     }
 }
 
-class MyViewHolder(view: View): RecyclerView.ViewHolder(view)
+class MyViewHolder(view: View): RecyclerView.ViewHolder(view){
+    val commentAuthor: TextView? = view.findViewById(R.id.comment_author)
+    val commentContent: TextView? = view.findViewById(R.id.comment_content)
+}
