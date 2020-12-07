@@ -1,9 +1,9 @@
 package com.projektekis.gpt3comedymaker
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -18,11 +18,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
 import java.io.IOException
 
+
+
 class MainActivity : AppCompatActivity() {
 
-    lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var toggle: ActionBarDrawerToggle
 
-    val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
+    private val url = "https://64c05aad7l.execute-api.us-east-2.amazonaws.com/Prod"
     var retrievedJsonJokesList: List<JsonJokes> = arrayListOf()
     private val goodFeedbackList: ArrayList<String> = arrayListOf()
     private val badFeedbackList: ArrayList<String> = arrayListOf()
@@ -34,6 +36,11 @@ class MainActivity : AppCompatActivity() {
         "I'll give you a list of the top 1% of the population who doesn't work two days a week, and " +
                 "a list of the worst 6% that doesn't work any more... and a great name.",
         "Wont forget my last job. I can't do this anymore. I've lost my mind.")
+
+    var jsonKeys: ArrayList<String> = arrayListOf()
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         talkToApi()
@@ -51,6 +58,11 @@ class MainActivity : AppCompatActivity() {
         val saveButton = findViewById<FloatingActionButton>(R.id.save_button)
         val showComments = findViewById<TextView>(R.id.main_show_comments)
         val commentList: RecyclerView = findViewById(R.id.main_comment_list)
+        val tinydb = TinyDB(this)
+
+        jsonKeys = tinydb.getListString("yourkey")
+        println("\n----Starting talk to api with keys---\n")
+        talkToApi(jsonKeys)
 
         var jokeIndex = 0
 
@@ -61,12 +73,14 @@ class MainActivity : AppCompatActivity() {
         saveButton.setOnClickListener{
             if(!savedJokesList.contains(retrievedJsonJokesList[jokeIndex])) {
                 savedJokesList.add(retrievedJsonJokesList[jokeIndex])
+
             }
         }
 
         jokeHeader.setOnClickListener{
             jokePunchline.isVisible = true
-            showComments.isVisible = true
+            if(retrievedJsonJokesList[jokeIndex].comments.isNotEmpty())
+                showComments.isVisible = true
         }
 
 
@@ -125,6 +139,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        print("---- now in onPause() -----")
+        val tinydb = TinyDB(this)
+        for(keys in savedJokesList)
+            jsonKeys.add(keys.id)
+        tinydb.putListString("yourkey", jsonKeys)
+    }
+
     private fun setUpNavigationDrawer() {
         toggle = ActionBarDrawerToggle(this, drawer_layout, R.string.open, R.string.close)
         drawer_layout.addDrawerListener(toggle)
@@ -166,7 +189,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun talkToApi(){
-        val contentList: ArrayList<String> = arrayListOf()
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object: Callback{
@@ -176,17 +198,38 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string()
-                println(body)
+                //println(body)
                 val gson = GsonBuilder().create()
 
                 val jsonJokesList = gson.fromJson(body, Array<JsonJokes>::class.java).toList()
-                println(jsonJokesList)
-               for (jsonJoke in jsonJokesList){
-                    contentList.add(jsonJoke.title + "\n\n"+ jsonJoke.body)
-                }
+                //println(jsonJokesList)
+
                 retrievedJsonJokesList = collectIncomingJson(jsonJokesList)
             }
         })
+    }
+
+    fun talkToApi(jsonKeys: ArrayList<String>){
+        val client = OkHttpClient()
+
+        for (key in jsonKeys){
+            val request = Request.Builder().url("$url/$key").build()
+
+            client.newCall(request).enqueue(object: Callback{
+                override fun onFailure(call: Call, e: IOException) {
+                    println("Failed to execute request.")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.body?.string()
+                    println(body)
+                    val gson = GsonBuilder().create()
+                    savedJokesList.add( gson.fromJson(body, JsonJokes::class.java))
+                }
+            })
+        }
+
+
     }
 
     fun collectIncomingJson(jsonJokesList: List<JsonJokes>): List<JsonJokes>{
@@ -194,10 +237,5 @@ class MainActivity : AppCompatActivity() {
         return jsonJokesList
     }
 
-//    fun setJokeIterator(jokeList: ArrayList<String>): Iterator<String>{
-//        return if (jokeList.isEmpty())
-//            defaultList.iterator()
-//        else
-//            jokeList.iterator()
-//    }
+
 }

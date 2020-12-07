@@ -2,6 +2,7 @@ package com.projektekis.gpt3comedymaker
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,6 +21,7 @@ class SavedJokes : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved_jokes)
+
 
         val favoriteJokes = intent.getParcelableArrayListExtra<JsonJokes>("nav")
 
